@@ -15,16 +15,17 @@ Suggestions and constructive criticism are always welcome!
 - [2. Training :hammer:](#2-training-hammer)
   - [2.1. Requirements :paperclip:](#21-requirements-paperclip)
   - [2.2. Training Script :chart_with_upwards_trend:](#22-training-script-chart_with_upwards_trend)
-  - [2.3. About the data used :open_file_folder:open_file_folder](#23-about-the-data-used-open_file_folderopen_file_folder)
+    - [2.2.1. Training GPT-2 in Catalan](#221-training-gpt-2-in-catalan)
+  - [2.3. About the data used for Catalan :open_file_folder:](#23-about-the-data-used-for-catalan-open_file_folder)
     - [2.3.1. WikiCorpus PROs :thumbsup:](#231-wikicorpus-pros-thumbsup)
     - [2.3.2. WikiCorpus CONs :thumbsdown:](#232-wikicorpus-cons-thumbsdown)
-  - [Further training for specific tasks :zap:](#further-training-for-specific-tasks-zap)
-- [Testing the model :cat:](#testing-the-model-cat)
-- [3. Questions  :question: :grey_question:](#3-questions--question-grey_question)
-  - [3.1. Why Catalan :question:](#31-why-catalan-question)
-  - [3.2. Why use a Pretrained model in Spanish :grey_question:](#32-why-use-a-pretrained-model-in-spanish-grey_question)
-  - [3.3. Can I use another data/language :question:](#33-can-i-use-another-datalanguage-question)
-- [4. TO-DO :construction:](#4-to-do-construction)
+  - [2.4. Further training for specific tasks :zap:](#24-further-training-for-specific-tasks-zap)
+- [3. Testing the model :cat:](#3-testing-the-model-cat)
+- [4. Questions  :question: :grey_question:](#4-questions--question-grey_question)
+  - [4.1. Why Catalan :question:](#41-why-catalan-question)
+  - [4.2. Why use a Pretrained model in Spanish :grey_question:](#42-why-use-a-pretrained-model-in-spanish-grey_question)
+  - [4.3. Can I use another data/language :question:](#43-can-i-use-another-datalanguage-question)
+- [5. TO-DO :construction:](#5-to-do-construction)
 
 
 
@@ -47,7 +48,32 @@ You will need a powerful GPU or reduce the batch size. You can also use a VM fro
 ## 2.2. Training Script :chart_with_upwards_trend:
 The training is implemented in the `train_GPT2.py` script, which serves as a skeleton. You can run it from the Commandline and passing all the arguments.
 
+
 e.g. 
+```bash
+cd src
+./train_GPT2.py \
+    --model <baseModel> \
+    --tokenizer <baseTokenizer> \
+    --train_path <path_to_training_data> \
+    --test_path <path_to_test_data> \
+    --n_epochs <number_of_epochs> \
+    --train_batch_size <size_batch_for_training> \
+    --eval_batch_size <size_batch_for_evaluation> \
+    --eval_steps <n_steps_during_training_for_evaluation> \
+    --save_steps <n_steps_checkpoint_save> \
+    --warmup_steps <warm_up_steps> \
+    --output <model_output_name>
+```
+### 2.2.1. Training GPT-2 in Catalan
+
+Taking advantage of the fact that Spanish is pretty close to the Catalan language, we may take its tokenizer.
+
+Nevertheless, as a TODO, we should create a tokenizer especificly for Catalan.
+
+We can also take advantage of previously trained models in Spanish and further train on them with data written in Catalan.
+
+For example:
 ```bash
 cd src
 ./train_GPT2.py \
@@ -60,13 +86,14 @@ cd src
     --eval_batch_size 8 \
     --eval_steps 100 \
     --save_steps 1000 \
-    --warmup_steps 100 \
+    --warmup_steps 300 \
     --output gpt2-catalan
 ```
+Note: Of course, the higher the batch size during training, the better. Change this accordingly to the GPU you have.
+Training on a CPU is also possible, but it is not advised at all, for it will take way longer.
 
 
-
-## 2.3. About the data used :open_file_folder:open_file_folder
+## 2.3. About the data used for Catalan :open_file_folder:
 The data used has mostly been the [WikiCorpus](https://www.cs.upc.edu/~nlp/wikicorpus/) data provided by the [Computer Science](https://www.cs.upc.edu/) department @ FIB, UPC (Facultat d'Informàtica de Barcelona, Universitat Politècnica de Catalunya).
 
 You can download it using the `datasets` library from Huggingface:
@@ -86,32 +113,33 @@ We are limiting the knowledge of the Language model to data from the Wikipedia. 
 
 Additionally, the size of the data is tiny with respect to what it should be.
 
-## Further training for specific tasks :zap:
+## 2.4. Further training for specific tasks :zap:
 Once the model is trained in Catalan and we have a base, we can further train this model for a specific task in mind.
 
 A couple of Proof of Concepts (PoC) have been done using data gathered from Twitter and also from Catalan songs.
 
-# Testing the model :cat:
+# 3. Testing the model :cat:
 We can test the trained model easily using the script `test_generation.py`.
 ```bash
 cd src
 python .\test_generation.py -t DeepESP/gpt2-spanish -m ../data/gpt2-catalan -i generation_test.txt
 ```
 
-# 3. Questions  :question: :grey_question:
-## 3.1. Why Catalan :question:
+# 4. Questions  :question: :grey_question:
+## 4.1. Why Catalan :question:
 Artificial Intelligence should not be only for largely spoken languages, such as English or even Spanish.
 Catalan, a minority language, is my mother tongue and it's always fun to see something you work with also operating in your own language. So why not?
 
 
-## 3.2. Why use a Pretrained model in Spanish :grey_question:
+## 4.2. Why use a Pretrained model in Spanish :grey_question:
 Although Spanish and Catalan are different languages, they share a lot of expressions, vocabulary and grammatical structures. Therefore, basing a Catalan model on a previously trained model in a close language such as Spanish is not unreasonable. 
 
 Transferring the knowledge from it to our model is better than starting from zero, specially to save computational time.
 
 
-## 3.3. Can I use another data/language :question:
-Even though the scripts are all prepared with the Catalan language in mind, the scripts should work with any text data, be it Catalan from the Wikicorpus, 
+## 4.3. Can I use another data/language :question:
+Even though the scripts are all prepared with the project of training the model with data in Catalan in mind, the scripts should work with any text data, be it Catalan from the Wikicorpus or texts from songs, books, etc.
+
 
 Feel free to change the `CatalanDataset` class or swap it with yours, since probably formatting of the input text is the most varying aspect between projects.
 
@@ -119,7 +147,10 @@ Be sure to also change the base model, since if you want to train another langua
 
 
 
-# 4. TO-DO :construction:
-Since we are actually using the Transfer learning approach and relying on a previously pretrained model in Spanish, we probably don't have as an accurate model as we should.
+# 5. TO-DO :construction:
 
-More varied data should also be used during the training, because it is very biased towards informative data (for obvious reasons).
+- Create our own Tokenizer.
+  
+- Train from scratch. Since we are actually using the Transfer learning approach and relying on a previously pretrained model in Spanish, we probably don't have as an accurate model as we should.
+
+- Increase the volume of data. More varied data should also be used during the training, because it is very biased towards informative data (for obvious reasons).
